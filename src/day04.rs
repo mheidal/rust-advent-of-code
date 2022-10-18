@@ -1,6 +1,7 @@
 use std::str::Split;
 use crate::read_input;
 
+#[derive(Clone, Copy)]
 struct Board {
     board: [[i32; 5]; 5],
     mark: [[bool; 5]; 5],
@@ -48,10 +49,30 @@ fn construct_board(line_set: [String; 5]) -> Board {
 }
 
 fn print_board(board: Board) {
-    for row in board.board {
+    for (row_index, row) in board.board.iter().enumerate() {
         let mut row_string = String::new();
+
+        for (col_index, col) in row.iter().enumerate() {
+            if board.mark[row_index][col_index] {
+                row_string.push_str(" X");
+            } else {
+                if format!("{col}").as_str().len() == 1 {
+                    row_string.push_str(" ");
+                    row_string.push_str(format!("{col}").as_str());
+                } else {
+                    row_string.push_str(format!("{col}").as_str());
+                }
+            }
+            row_string.push_str(" ");
+        }
+        row_string.push_str("  |  ");
         for col in row {
-            row_string.push_str(format!("{col}").as_str());
+            if format!("{col}").as_str().len() == 1 {
+                row_string.push_str(" ");
+                row_string.push_str(format!("{col}").as_str());
+            } else {
+                row_string.push_str(format!("{col}").as_str());
+            }
             row_string.push_str(" ");
         }
         println!("{}", row_string);
@@ -117,7 +138,7 @@ fn mark_val_on_boards(val: i32, boards: &mut Vec<Board>) {
     }
 }
 
-fn check_board_won(board: &Board) -> bool {
+fn board_has_won(board: &Board) -> bool {
     // rows
     for row in board.mark {
         let mut row_won: bool = true;
@@ -142,18 +163,7 @@ fn check_board_won(board: &Board) -> bool {
             return true;
         }
     }
-    // diagonals (upper/lower left/right)
-    let mut ul_lr_won = true;
-    let mut ll_ur_won = true;
-    for i in 0..5 {
-        if !board.mark[i][i] {
-            ul_lr_won = false;
-        }
-        if !board.mark[4-i][i] {
-            ll_ur_won = false;
-        }
-    }
-    ul_lr_won || ll_ur_won
+    false
 }
 
 fn get_sum_of_unmarked_values(board: &Board) -> i32 {
@@ -172,9 +182,9 @@ fn part_1() -> i32 {
     let (instructions, mut board_list) = get_instructions_and_boards();
     for instr in instructions {
         mark_val_on_boards(instr, &mut board_list);
-        for board in &board_list {
-            if check_board_won(board) {
-                let board_sum = get_sum_of_unmarked_values(board);
+        for board in board_list.iter() {
+            if board_has_won(board) {
+                let board_sum = get_sum_of_unmarked_values(&board);
                 return board_sum * instr;
             }
         }
@@ -182,10 +192,46 @@ fn part_1() -> i32 {
     panic!("No winning board discovered.")
 }
 
+fn part_2() -> i32 {
+    let (instructions, mut prev_unfinished_boards) = get_instructions_and_boards();
+    for (i, instr) in instructions.iter().enumerate() {
+        println!("{i}: {}", *instr);
+        let mut new_unfinished_boards = Vec::new();
+        mark_val_on_boards(*instr, &mut prev_unfinished_boards);
+        for board in prev_unfinished_boards.iter() {
+            if !board_has_won(board) {
+                new_unfinished_boards.push(board.clone())
+            } else {
+                println!("Eliminated board")
+            }
+        }
+
+        if new_unfinished_boards.len() == 0 {
+            println!("All boards have won");
+            let prev_b_len = prev_unfinished_boards.len();
+            println!("Length of prev boards is {}", prev_b_len);
+            let last_board = match prev_unfinished_boards.pop() {
+                Some(b) => b,
+                None => panic!("No last board - what?"),
+            };
+
+            let last_board_sum = get_sum_of_unmarked_values(&last_board);
+            println!("Winning value: {}", instr);
+            println!("Winning board sum: {}", last_board_sum);
+            print_board(last_board);
+            return last_board_sum * instr;
+        }
+
+        prev_unfinished_boards = new_unfinished_boards
+
+    }
+    panic!("There was never only one winning board.")
+}
+
 pub fn solve_puzzle() {
     println!("Day 4");
-    let ans_1 = part_1();
-    println!("Part 1: {}", ans_1);
-    // let ans_2 = part_2();
-    // println!("Part 2: {}", ans_2);
+    // let ans_1 = part_1();
+    // println!("Part 1: {}", ans_1);
+    let ans_2 = part_2();
+    println!("Part 2: {}", ans_2);
 }
