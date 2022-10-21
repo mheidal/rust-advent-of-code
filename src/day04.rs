@@ -230,8 +230,8 @@ fn part_2() -> i32 {
 
 pub fn solve_puzzle() {
     println!("Day 4");
-    // let ans_1 = part_1();
-    // println!("Part 1: {}", ans_1);
+    let ans_1 = part_1();
+    println!("Part 1: {}", ans_1);
     let ans_2 = part_2();
     println!("Part 2: {}", ans_2);
 }
