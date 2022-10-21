@@ -142,22 +142,6 @@ fn get_num_of_line_intersections(board: Vec<Vec<i32>>) -> i32 {
     count
 }
 
-fn display_board(board: &Vec<Vec<i32>>) {
-    let mut whole_string = String::new();
-    for row in board {
-        let mut row_string = String::new();
-        for entry in row {
-            if *entry == 0 {
-                row_string.push('.');
-            } else {
-                row_string.push_str(entry.to_string().as_str());
-            }
-        }
-        whole_string.push_str(row_string.as_str());
-        whole_string.push('\n');
-    }
-    println!("{}", whole_string);
-}
 
 fn part_1() -> i32 {
     let coords = get_coord_list();
@@ -178,10 +162,8 @@ fn part_2() -> i32 {
             add_to_board(&mut board, &point);
         }
     }
-    // display_board(&board);
     get_num_of_line_intersections(board)
 }
-
 
 pub fn solve_puzzle() {
     println!("Day 4");
