@@ -7,6 +7,7 @@ mod day03;
 mod day04;
 mod day05;
 mod day06;
+mod day07;
 
 fn main() {
     if false {
@@ -15,6 +16,7 @@ fn main() {
         day03::solve_puzzle();
         day04::solve_puzzle();
         day05::solve_puzzle();
+        day06::solve_puzzle();
     }
-    day06::solve_puzzle();
+    day07::solve_puzzle();
 }
